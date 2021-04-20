@@ -1,6 +1,11 @@
 var text_chain  = [ "is a software engineer", 
 "is a blockchain evangelist", "is a very talented programmer", 
-"is an excellent technical writer", "writes excellent code", "is a security champion"];
+"excels as a technical writer", "excels at coding", "is a security champion", "is a raspberry pi hacker",
+"is a whitehat", "is into Dungeons & Dragons", "is a cypherpunk", "is a cyber security professional", 
+"is a team player", "is a teammate you'd want to have", "Python programmer extraordinaire", "has used Javascript plenty of times",
+"runs Windows on a RaspberryPi", "runs Android on a Nintendo Switch", "uses monero", "uses cryptocurrency", "programs REST APIs",
+"programs web servers", "enjoys programming the back-end", "is a full-stack developer", "perfers cli to gui", "uses both vim and spaces",
+"watches starcraft esports", "listens to history podcasts", "lists a lot of hobbies on his website"];
 
 for (var t = 0; t < text_chain.length; t++ ) {
     text_chain[t] = text_chain[t] + ".     ";
@@ -28,11 +33,11 @@ function oldAlgorithm(){
 
 function typeWriter() {
   var txt = text_chain 
-  var txtIndex = 0;
+  var txtIndex = Math.floor(Math.random()*(txt.length-1)) + 1;
   var statementChangingVar = 0;
   var i = 0;
   var isStatementComplete = 0;
-  var nextIndex;
+  var nextIndex=Math.floor(Math.random()*(txt.length-1)) + 1;
   function description() {
     if (i < txt[txtIndex].length && isStatementComplete == 0) {
       $("#description").html(txt[txtIndex].substring(0,i))
@@ -46,11 +51,7 @@ function typeWriter() {
     else if (isStatementComplete==1 && i!=0){
       i--;
       $("#description").html(txt[txtIndex].substring(0,i))
-      if (txt[txtIndex+1]) {
-        nextIndex = txtIndex + 1;
-      } else {
-        nextIndex = 0;
-      };
+
       if (txt[txtIndex].substring(0,i) == txt[nextIndex].substring(0,i)){
         isStatementComplete = 2;
       }
@@ -59,7 +60,9 @@ function typeWriter() {
     else if (isStatementComplete==2){
       isStatementComplete=0;
       statementChangingVar++;
-      txtIndex = statementChangingVar % txt.length;
+      txtIndex = nextIndex//statementChangingVar % txt.length;
+      nextIndex = Math.floor(Math.random()*(txt.length-1)) + 1
+
       setTimeout(description, delay);
   }
   };
