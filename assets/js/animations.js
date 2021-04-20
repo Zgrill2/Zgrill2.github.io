@@ -15,7 +15,7 @@ var index = 0;
 //$("#description").fadeTo( 1, 0 );
 
 var f = typeWriter
-var delay = 50;
+var delay = 55;
 
 f();
 
