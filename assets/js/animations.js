@@ -12,7 +12,6 @@ for (var t = 0; t < text_chain.length; t++ ) {
 };
 var index = 0;
 
-//$("#description").fadeTo( 1, 0 );
 
 var f = typeWriter
 var delay = 55;
@@ -60,11 +59,12 @@ function typeWriter() {
     else if (isStatementComplete==2){
       isStatementComplete=0;
       statementChangingVar++;
-      txtIndex = nextIndex//statementChangingVar % txt.length;
+      txtIndex = nextIndex
       nextIndex = Math.floor(Math.random()*(txt.length-1)) + 1
 
       setTimeout(description, delay);
   }
   };
   description();
+  //Provided by danielhwile https://github.com/danielhwile edited by Zgrill2 https://github.com/Zgrill2
 };
