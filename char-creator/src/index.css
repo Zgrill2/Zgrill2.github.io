@@ -1,0 +1,172 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Cosmic color system */
+    --navy-deep: #0A1628;
+    --navy-mid: #1A2942;
+    --navy-light: #2A3F5F;
+    --cyan-electric: #00E5FF;
+    --cyan-bright: #5CFFFF;
+    --cyan-muted: #1ACFEF;
+    --cosmic-white: #E8F4F8;
+    --cosmic-grey: #8BA3B8;
+    --cosmic-dim: #4A5F7A;
+  }
+
+  body {
+    margin: 0;
+    font-family: theme('fontFamily.sans');
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    min-height: 100vh;
+    background: linear-gradient(to bottom right, var(--navy-deep), var(--navy-mid));
+    color: var(--cosmic-white);
+    line-height: 1.6;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  h1 { font-size: 2.5rem; font-weight: 700; }
+  h2 { font-size: 2rem; font-weight: 600; }
+  h3 { font-size: 1.5rem; font-weight: 600; }
+  h4 { font-size: 1.25rem; font-weight: 500; }
+}
+
+@layer components {
+  /* Constellation pattern overlay */
+  .constellation-border {
+    position: relative;
+  }
+
+  .constellation-border::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background-image: url('/constellation-pattern.svg');
+    background-size: 200px 200px;
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .constellation-border:hover::before {
+    animation: constellation-pulse 3s ease-in-out infinite;
+  }
+
+  /* Panel styling with cosmic theme */
+  .panel {
+    @apply bg-navy-mid rounded-xl border-2 border-navy-light constellation-border;
+    @apply shadow-panel p-6 transition-all duration-300 print-break-inside-avoid;
+    position: relative;
+  }
+
+  .panel > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .panel:hover {
+    @apply shadow-panel-hover border-cyan-electric;
+  }
+
+  .panel-header {
+    @apply text-2xl font-bold mb-4 flex items-center justify-between;
+    @apply text-cosmic-white;
+    letter-spacing: 0.02em;
+  }
+
+  /* Input styling */
+  .input-standard {
+    @apply px-3 py-2 border-2 rounded-lg;
+    @apply bg-navy-deep border-navy-light;
+    @apply text-cosmic-white;
+    @apply focus:ring-2 focus:ring-cyan-electric focus:border-cyan-electric transition-all duration-200;
+  }
+
+  .input-standard:hover {
+    @apply border-cyan-muted;
+  }
+
+  /* Button styling */
+  .btn-primary {
+    @apply px-4 py-2 rounded-lg font-medium;
+    @apply bg-cyan-electric text-navy-deep;
+    @apply hover:bg-cyan-bright hover:shadow-glow-cyan-sm;
+    @apply transition-all duration-200 flex items-center gap-2;
+    @apply active:scale-[0.98];
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 rounded-lg font-medium;
+    @apply bg-navy-light text-cosmic-white border-2 border-navy-light;
+    @apply hover:border-cyan-electric hover:shadow-glow-cyan-sm;
+    @apply transition-all duration-200 flex items-center gap-2;
+  }
+
+  /* Stat chip styling */
+  .stat-chip {
+    @apply inline-flex items-center gap-2 px-3 py-1.5;
+    @apply bg-navy-deep border-2 border-cyan-electric rounded-full;
+    @apply text-sm font-mono font-medium text-cosmic-white;
+  }
+
+  /* Tab button styling */
+  .tab-button {
+    @apply px-6 py-3 font-semibold border-b-4 border-transparent;
+    @apply transition-all duration-300 relative flex items-center gap-2;
+    @apply text-cosmic-grey;
+  }
+
+  .tab-button:hover {
+    @apply bg-navy-light bg-opacity-50 text-cosmic-white;
+    @apply shadow-glow-cyan-sm;
+  }
+
+  .tab-button.active {
+    @apply border-cyan-electric text-cyan-electric;
+  }
+
+  .tab-button.active::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 transform -translate-x-1/2;
+    @apply w-2 h-2 rounded-full bg-cyan-electric;
+    box-shadow: 0 0 8px var(--cyan-electric);
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: var(--navy-deep);
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--navy-light);
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--cyan-muted);
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .print-break-inside-avoid {
+    break-inside: avoid;
+  }
+}
