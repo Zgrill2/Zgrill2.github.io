@@ -1,0 +1,296 @@
+[
+  {
+    "name": "ATHLETICS",
+    "type": "parent",
+    "attribute": "str",
+    "costMultiplier": 2.5,
+    "category": "Athletics"
+  },
+  {
+    "name": "Athletics",
+    "type": "individual",
+    "attribute": "str",
+    "costMultiplier": 1,
+    "category": "Athletics"
+  },
+  {
+    "name": "Strongman",
+    "type": "individual",
+    "attribute": "str",
+    "costMultiplier": 1,
+    "category": "Athletics"
+  },
+  {
+    "name": "Gymnastics",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1,
+    "category": "Athletics"
+  },
+  {
+    "name": "Swimming",
+    "type": "individual",
+    "attribute": "bod",
+    "costMultiplier": 1,
+    "category": "Athletics"
+  },
+  {
+    "name": "Running",
+    "type": "individual",
+    "attribute": "bod",
+    "costMultiplier": 1,
+    "category": "Athletics"
+  },
+  {
+    "name": "SURVIVAL",
+    "type": "parent",
+    "attribute": "int",
+    "costMultiplier": 2.5,
+    "category": "Survival"
+  },
+  {
+    "name": "Survival",
+    "type": "individual",
+    "attribute": "int",
+    "costMultiplier": 1,
+    "category": "Survival"
+  },
+  {
+    "name": "Tracking",
+    "type": "individual",
+    "attribute": "int",
+    "costMultiplier": 1,
+    "category": "Survival"
+  },
+  {
+    "name": "Navigation",
+    "type": "individual",
+    "attribute": "int",
+    "costMultiplier": 1,
+    "category": "Survival"
+  },
+  {
+    "name": "Outdoorsmanship",
+    "type": "individual",
+    "attribute": "int",
+    "costMultiplier": 1,
+    "category": "Survival"
+  },
+  {
+    "name": "INFLUENCE",
+    "type": "parent",
+    "attribute": "cha",
+    "costMultiplier": 2.5,
+    "category": "Influence"
+  },
+  {
+    "name": "Influence",
+    "type": "individual",
+    "attribute": "cha",
+    "costMultiplier": 1,
+    "category": "Influence"
+  },
+  {
+    "name": "Intimidation",
+    "type": "individual",
+    "attribute": "cha",
+    "costMultiplier": 1,
+    "category": "Influence"
+  },
+  {
+    "name": "Persuasion",
+    "type": "individual",
+    "attribute": "cha",
+    "costMultiplier": 1,
+    "category": "Influence"
+  },
+  {
+    "name": "Leadership",
+    "type": "individual",
+    "attribute": "cha",
+    "costMultiplier": 1,
+    "category": "Influence"
+  },
+  {
+    "name": "Deception",
+    "type": "individual",
+    "attribute": "cha",
+    "costMultiplier": 1,
+    "category": "Influence"
+  },
+  {
+    "name": "SUBTERFUGE",
+    "type": "parent",
+    "attribute": "agi",
+    "costMultiplier": 2.5,
+    "category": "Subterfuge"
+  },
+  {
+    "name": "Subterfuge",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1,
+    "category": "Subterfuge"
+  },
+  {
+    "name": "Stealth",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1,
+    "category": "Subterfuge"
+  },
+  {
+    "name": "Sleight of Hand",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1,
+    "category": "Subterfuge"
+  },
+  {
+    "name": "Lockpicking",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1,
+    "category": "Subterfuge"
+  },
+  {
+    "name": "Perception",
+    "type": "individual",
+    "attribute": "int",
+    "costMultiplier": 1,
+    "category": "General"
+  },
+  {
+    "name": "Investigation",
+    "type": "individual",
+    "attribute": "log",
+    "costMultiplier": 1,
+    "category": "General"
+  },
+  {
+    "name": "Medicine",
+    "type": "individual",
+    "attribute": "log",
+    "costMultiplier": 1,
+    "category": "General"
+  },
+  {
+    "name": "First Aid",
+    "type": "individual",
+    "attribute": "int",
+    "costMultiplier": 1,
+    "category": "General"
+  },
+  {
+    "name": "Dodge",
+    "type": "individual",
+    "attribute": "rea",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Parry",
+    "type": "individual",
+    "attribute": "rea",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Block",
+    "type": "individual",
+    "attribute": "rea",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Melee Weapons",
+    "type": "individual",
+    "attribute": "str",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Ranged Weapons",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Unarmed Combat",
+    "type": "individual",
+    "attribute": "str",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Light Weapons",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Heavy Weapons",
+    "type": "individual",
+    "attribute": "str",
+    "costMultiplier": 1,
+    "category": "Combat"
+  },
+  {
+    "name": "Knowledge: Arcana",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  },
+  {
+    "name": "Knowledge: History",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  },
+  {
+    "name": "Knowledge: Nature",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  },
+  {
+    "name": "Knowledge: Religion",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  },
+  {
+    "name": "Knowledge: Geography",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  },
+  {
+    "name": "Knowledge: Politics",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  },
+  {
+    "name": "Knowledge: Engineering",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  },
+  {
+    "name": "Knowledge: Planes",
+    "type": "knowledge",
+    "attribute": "log",
+    "costMultiplier": 0.5,
+    "category": "Knowledge"
+  }
+]
