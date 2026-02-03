@@ -92,7 +92,7 @@ export const lightSword: Weapon = {
   power: 4,
   reach: 1,
   shield: 'none',
-  skillName: 'Blades',
+  skillName: 'Weapon',
 };
 
 export const heavyAxe: Weapon = {
@@ -102,7 +102,7 @@ export const heavyAxe: Weapon = {
   power: 8,
   reach: 2,
   shield: 'none',
-  skillName: 'Axes',
+  skillName: 'Weapon',
 };
 
 export const swordAndBoard: Weapon = {
@@ -112,7 +112,7 @@ export const swordAndBoard: Weapon = {
   power: 5,
   reach: 1,
   shield: 'medium',
-  skillName: 'Blades',
+  skillName: 'Weapon',
 };
 
 // ============================================================================
@@ -203,10 +203,11 @@ export const basicCharacter: Character = {
   castStat: 'wil',
   affinities: balancedAffinities,
   skills: {
-    'Blades': 3,
-    'Athletics': 2,
+    'Weapon': 3,
+    'Strongman': 2,
     'Dodge': 4,
   },
+  knowledgeSkills: [],
   abilities: [
     { name: 'Test Single Rank', rank: 1 },
   ],
@@ -226,6 +227,7 @@ export const minimalCharacter: Character = {
   castStat: 'wil',
   affinities: emptyAffinities,
   skills: {},
+  knowledgeSkills: [],
   abilities: [],
   weapons: [],
   armorType: 'none',
@@ -249,12 +251,11 @@ export const maxedCharacter: Character = {
     g: 6,
   },
   skills: {
-    'Blades': 10,
-    'Axes': 10,
+    'Weapon': 10,
     'Dodge': 10,
-    'Parry': 10,
-    'Block': 10,
+    'Stealth': 10,
   },
+  knowledgeSkills: [],
   abilities: [
     { name: 'Test Multi Rank', rank: 3 },
   ],
@@ -290,13 +291,13 @@ export const highSkillCharacter: Character = {
     g: 3,
   },
   skills: {
-    'Blades': 5,
-    'Axes': 4,
+    'Weapon': 5,
     'Dodge': 4,
-    'Parry': 3,
-    'Block': 2,
-    'Athletics': 3,
+    'Strongman': 3,
+    'Stealth': 3,
+    'Perception': 2,
   },
+  knowledgeSkills: [],
   abilities: [
     { name: 'Test Single Rank', rank: 1 },
     { name: 'Test Multi Rank', rank: 2 },
@@ -313,15 +314,12 @@ export const highSkillCharacter: Character = {
 // ============================================================================
 
 export const mockSkills = {
-  'Blades': { category: 'Combat', multiplier: 1.0 },
-  'Axes': { category: 'Combat', multiplier: 1.0 },
-  'Dodge': { category: 'Defense', multiplier: 1.0 },
-  'Parry': { category: 'Defense', multiplier: 1.0 },
-  'Block': { category: 'Defense', multiplier: 1.0 },
-  'Athletics': { category: 'Physical', multiplier: 1.0 },
-  'Stealth': { category: 'Physical', multiplier: 1.0 },
-  'Perception': { category: 'Mental', multiplier: 1.0 },
-  'Knowledge': { category: 'Knowledge', multiplier: 0.5 },
+  'Weapon': { category: 'Ungrouped', multiplier: 1.0 },
+  'Dodge': { category: 'Ungrouped', multiplier: 1.0 },
+  'Stealth': { category: 'Subterfuge', multiplier: 1.0 },
+  'Strongman': { category: 'Athletics', multiplier: 1.0 },
+  'Perception': { category: 'Ungrouped', multiplier: 1.0 },
+  'Spellcasting': { category: 'Ungrouped', multiplier: 1.0 },
 };
 
 // ============================================================================

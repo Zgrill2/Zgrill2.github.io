@@ -19,7 +19,7 @@ export default function WeaponsPanel() {
       reach: 0,
       shield: 'none',
       element: '',
-      skillName: 'Melee Weapons',
+      skillName: 'Weapon',
     };
     setEditingWeapon(newWeapon);
     setExpandedWeaponId(newWeapon.id);
@@ -146,7 +146,7 @@ export default function WeaponsPanel() {
                   value={editingWeapon.skillName || ''}
                   onChange={(e) => setEditingWeapon({ ...editingWeapon, skillName: e.target.value })}
                   className="w-full input-standard"
-                  placeholder="e.g., Melee Weapons, Ranged Weapons"
+                  placeholder="e.g., Weapon"
                 />
               </div>
             </div>
@@ -323,7 +323,7 @@ export default function WeaponsPanel() {
                           value={editingWeapon?.skillName ?? weapon.skillName ?? ''}
                           onChange={(e) => setEditingWeapon({ ...(editingWeapon || weapon), skillName: e.target.value })}
                           className="w-full input-standard"
-                          placeholder="e.g., Melee Weapons, Ranged Weapons"
+                          placeholder="e.g., Weapon"
                         />
                       </div>
                     </div>

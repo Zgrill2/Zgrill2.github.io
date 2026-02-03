@@ -7,39 +7,36 @@
     "category": "Athletics"
   },
   {
-    "name": "Athletics",
-    "type": "individual",
-    "attribute": "str",
-    "costMultiplier": 1,
-    "category": "Athletics"
-  },
-  {
     "name": "Strongman",
     "type": "individual",
     "attribute": "str",
     "costMultiplier": 1,
-    "category": "Athletics"
+    "category": "Athletics",
+    "parentGroup": "ATHLETICS"
   },
   {
     "name": "Gymnastics",
     "type": "individual",
     "attribute": "agi",
     "costMultiplier": 1,
-    "category": "Athletics"
+    "category": "Athletics",
+    "parentGroup": "ATHLETICS"
   },
   {
-    "name": "Swimming",
+    "name": "Marathoner",
     "type": "individual",
     "attribute": "bod",
     "costMultiplier": 1,
-    "category": "Athletics"
+    "category": "Athletics",
+    "parentGroup": "ATHLETICS"
   },
   {
-    "name": "Running",
+    "name": "Traversal",
     "type": "individual",
-    "attribute": "bod",
+    "attribute": "rea",
     "costMultiplier": 1,
-    "category": "Athletics"
+    "category": "Athletics",
+    "parentGroup": "ATHLETICS"
   },
   {
     "name": "SURVIVAL",
@@ -49,32 +46,36 @@
     "category": "Survival"
   },
   {
-    "name": "Survival",
-    "type": "individual",
-    "attribute": "int",
-    "costMultiplier": 1,
-    "category": "Survival"
-  },
-  {
-    "name": "Tracking",
-    "type": "individual",
-    "attribute": "int",
-    "costMultiplier": 1,
-    "category": "Survival"
-  },
-  {
     "name": "Navigation",
     "type": "individual",
     "attribute": "int",
     "costMultiplier": 1,
-    "category": "Survival"
+    "category": "Survival",
+    "parentGroup": "SURVIVAL"
   },
   {
-    "name": "Outdoorsmanship",
+    "name": "Survival",
+    "type": "individual",
+    "attribute": "wil",
+    "costMultiplier": 1,
+    "category": "Survival",
+    "parentGroup": "SURVIVAL"
+  },
+  {
+    "name": "Medicine",
+    "type": "individual",
+    "attribute": "log",
+    "costMultiplier": 1,
+    "category": "Survival",
+    "parentGroup": "SURVIVAL"
+  },
+  {
+    "name": "Animal Handling",
     "type": "individual",
     "attribute": "int",
     "costMultiplier": 1,
-    "category": "Survival"
+    "category": "Survival",
+    "parentGroup": "SURVIVAL"
   },
   {
     "name": "INFLUENCE",
@@ -84,39 +85,36 @@
     "category": "Influence"
   },
   {
-    "name": "Influence",
+    "name": "Con",
     "type": "individual",
     "attribute": "cha",
     "costMultiplier": 1,
-    "category": "Influence"
+    "category": "Influence",
+    "parentGroup": "INFLUENCE"
+  },
+  {
+    "name": "Insight",
+    "type": "individual",
+    "attribute": "int",
+    "costMultiplier": 1,
+    "category": "Influence",
+    "parentGroup": "INFLUENCE"
   },
   {
     "name": "Intimidation",
     "type": "individual",
     "attribute": "cha",
     "costMultiplier": 1,
-    "category": "Influence"
+    "category": "Influence",
+    "parentGroup": "INFLUENCE"
   },
   {
-    "name": "Persuasion",
+    "name": "Negotiation",
     "type": "individual",
     "attribute": "cha",
     "costMultiplier": 1,
-    "category": "Influence"
-  },
-  {
-    "name": "Leadership",
-    "type": "individual",
-    "attribute": "cha",
-    "costMultiplier": 1,
-    "category": "Influence"
-  },
-  {
-    "name": "Deception",
-    "type": "individual",
-    "attribute": "cha",
-    "costMultiplier": 1,
-    "category": "Influence"
+    "category": "Influence",
+    "parentGroup": "INFLUENCE"
   },
   {
     "name": "SUBTERFUGE",
@@ -126,171 +124,71 @@
     "category": "Subterfuge"
   },
   {
-    "name": "Subterfuge",
+    "name": "Disguise",
     "type": "individual",
-    "attribute": "agi",
+    "attribute": "int",
     "costMultiplier": 1,
-    "category": "Subterfuge"
+    "category": "Subterfuge",
+    "parentGroup": "SUBTERFUGE"
   },
   {
     "name": "Stealth",
     "type": "individual",
     "attribute": "agi",
     "costMultiplier": 1,
-    "category": "Subterfuge"
+    "category": "Subterfuge",
+    "parentGroup": "SUBTERFUGE"
   },
   {
-    "name": "Sleight of Hand",
+    "name": "Legerdemain",
     "type": "individual",
     "attribute": "agi",
     "costMultiplier": 1,
-    "category": "Subterfuge"
+    "category": "Subterfuge",
+    "parentGroup": "SUBTERFUGE"
   },
   {
-    "name": "Lockpicking",
+    "name": "Thievery",
     "type": "individual",
     "attribute": "agi",
     "costMultiplier": 1,
-    "category": "Subterfuge"
+    "category": "Subterfuge",
+    "parentGroup": "SUBTERFUGE"
+  },
+  {
+    "name": "Spellcasting",
+    "type": "individual",
+    "attribute": "log",
+    "costMultiplier": 1
+  },
+  {
+    "name": "Perceive Magic",
+    "type": "individual",
+    "attribute": "log",
+    "costMultiplier": 1
+  },
+  {
+    "name": "Weapon",
+    "type": "individual",
+    "attribute": "agi",
+    "costMultiplier": 1
   },
   {
     "name": "Perception",
     "type": "individual",
     "attribute": "int",
-    "costMultiplier": 1,
-    "category": "General"
-  },
-  {
-    "name": "Investigation",
-    "type": "individual",
-    "attribute": "log",
-    "costMultiplier": 1,
-    "category": "General"
-  },
-  {
-    "name": "Medicine",
-    "type": "individual",
-    "attribute": "log",
-    "costMultiplier": 1,
-    "category": "General"
-  },
-  {
-    "name": "First Aid",
-    "type": "individual",
-    "attribute": "int",
-    "costMultiplier": 1,
-    "category": "General"
+    "costMultiplier": 1
   },
   {
     "name": "Dodge",
     "type": "individual",
     "attribute": "rea",
-    "costMultiplier": 1,
-    "category": "Combat"
+    "costMultiplier": 1
   },
   {
-    "name": "Parry",
+    "name": "Perseverance",
     "type": "individual",
-    "attribute": "rea",
-    "costMultiplier": 1,
-    "category": "Combat"
-  },
-  {
-    "name": "Block",
-    "type": "individual",
-    "attribute": "rea",
-    "costMultiplier": 1,
-    "category": "Combat"
-  },
-  {
-    "name": "Melee Weapons",
-    "type": "individual",
-    "attribute": "str",
-    "costMultiplier": 1,
-    "category": "Combat"
-  },
-  {
-    "name": "Ranged Weapons",
-    "type": "individual",
-    "attribute": "agi",
-    "costMultiplier": 1,
-    "category": "Combat"
-  },
-  {
-    "name": "Unarmed Combat",
-    "type": "individual",
-    "attribute": "str",
-    "costMultiplier": 1,
-    "category": "Combat"
-  },
-  {
-    "name": "Light Weapons",
-    "type": "individual",
-    "attribute": "agi",
-    "costMultiplier": 1,
-    "category": "Combat"
-  },
-  {
-    "name": "Heavy Weapons",
-    "type": "individual",
-    "attribute": "str",
-    "costMultiplier": 1,
-    "category": "Combat"
-  },
-  {
-    "name": "Knowledge: Arcana",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
-  },
-  {
-    "name": "Knowledge: History",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
-  },
-  {
-    "name": "Knowledge: Nature",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
-  },
-  {
-    "name": "Knowledge: Religion",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
-  },
-  {
-    "name": "Knowledge: Geography",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
-  },
-  {
-    "name": "Knowledge: Politics",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
-  },
-  {
-    "name": "Knowledge: Engineering",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
-  },
-  {
-    "name": "Knowledge: Planes",
-    "type": "knowledge",
-    "attribute": "log",
-    "costMultiplier": 0.5,
-    "category": "Knowledge"
+    "attribute": "wil",
+    "costMultiplier": 1
   }
 ]

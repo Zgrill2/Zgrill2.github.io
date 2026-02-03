@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useCharacter } from '../hooks/useCharacter';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 import { Save, FolderOpen, Download, Upload, FileText, Sparkles } from 'lucide-react';
 import BPDisplay from './BPDisplay';
 import ThemeSwitcher from './ThemeSwitcher';
@@ -11,20 +12,25 @@ export default function Header() {
   const { character, setName, setBPBudget, loadCharacter: loadChar, resetCharacter } =
     useCharacter();
   const { themeColors } = useTheme();
+  const { showToast } = useToast();
   const [showBudgetInput, setShowBudgetInput] = useState(false);
 
   const handleSave = () => {
+    const confirmed = confirm(
+      'There is only one save slot in browser storage. Saving will overwrite any previously saved character.\nUse Export to keep multiple characters.\n\nContinue?'
+    );
+    if (!confirmed) return;
     saveCharacter(character);
-    alert('Character saved to browser storage!');
+    showToast('Character saved!', 'success');
   };
 
   const handleLoad = () => {
     const loaded = loadCharacter();
     if (loaded) {
       loadChar(loaded);
-      alert('Character loaded!');
+      showToast('Character loaded!', 'success');
     } else {
-      alert('No saved character found.');
+      showToast('No saved character found.', 'warning');
     }
   };
 
@@ -42,9 +48,9 @@ export default function Header() {
         try {
           const imported = await importCharacter(file);
           loadChar(imported);
-          alert('Character imported successfully!');
+          showToast('Character imported!', 'success');
         } catch (error) {
-          alert('Failed to import character: ' + (error as Error).message);
+          showToast('Failed to import: ' + (error as Error).message, 'error');
         }
       }
     };

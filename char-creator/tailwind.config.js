@@ -65,6 +65,8 @@ export default {
         'shimmer': 'shimmer 3s ease-in-out infinite',
         'pulse-glow': 'pulse-glow 2s ease-in-out infinite',
         'constellation-pulse': 'constellation-pulse 3s ease-in-out infinite',
+        'toast-in': 'toast-in 0.3s ease-out',
+        'toast-out': 'toast-out 0.3s ease-in forwards',
       },
       keyframes: {
         shimmer: {
@@ -78,6 +80,14 @@ export default {
         'constellation-pulse': {
           '0%, 100%': { opacity: '0.15' },
           '50%': { opacity: '0.25' },
+        },
+        'toast-in': {
+          '0%': { opacity: '0', transform: 'translateY(-1rem)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        'toast-out': {
+          '0%': { opacity: '1', transform: 'translateY(0)' },
+          '100%': { opacity: '0', transform: 'translateY(-1rem)' },
         },
       },
     },

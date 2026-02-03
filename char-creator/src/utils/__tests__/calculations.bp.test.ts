@@ -5,9 +5,12 @@ import {
   calculateTraditionCost,
   calculateSkillCost,
   calculateKnowledgeDiscount,
+  calculateKnowledgeSkillCosts,
   calculateAbilityCosts,
   calculateAffinityPoints,
   calculateTotalBPSpent,
+  calculateGroupAwareSkillCosts,
+  getEffectiveSkillRank,
 } from '../calculations';
 import {
   minAttributes,
@@ -18,14 +21,11 @@ import {
   multiRankAbility,
 } from '../../test/mockData';
 import type { Attributes } from '../../types/character';
-import type { Ability } from '../../types/ability';
 import type { SkillDefinition } from '../../types/skill';
 
 describe('calculateAttributeCost', () => {
   describe('basic calculations', () => {
     it('should return 0 for value = 1 (minimum)', () => {
-      // Formula: (value^2 + value - 2) * 2.5
-      // value = 1: (1 + 1 - 2) * 2.5 = 0 * 2.5 = 0
       expect(calculateAttributeCost(1)).toBe(0);
     });
 
@@ -34,17 +34,14 @@ describe('calculateAttributeCost', () => {
     });
 
     it('should calculate cost for value = 2', () => {
-      // (4 + 2 - 2) * 2.5 = 4 * 2.5 = 10
       expect(calculateAttributeCost(2)).toBe(10);
     });
 
     it('should calculate cost for value = 5', () => {
-      // (25 + 5 - 2) * 2.5 = 28 * 2.5 = 70
       expect(calculateAttributeCost(5)).toBe(70);
     });
 
     it('should calculate cost for value = 10 (maximum)', () => {
-      // (100 + 10 - 2) * 2.5 = 108 * 2.5 = 270
       expect(calculateAttributeCost(10)).toBe(270);
     });
   });
@@ -52,7 +49,6 @@ describe('calculateAttributeCost', () => {
   describe('progressive cost increase', () => {
     it('should have increasing costs', () => {
       const costs = [1, 2, 3, 4, 5].map(calculateAttributeCost);
-      // Verify each cost is higher than the previous
       for (let i = 1; i < costs.length; i++) {
         expect(costs[i]).toBeGreaterThan(costs[i - 1]);
       }
@@ -78,7 +74,6 @@ describe('calculateAttributeCosts', () => {
   });
 
   it('should calculate total for mixed attributes', () => {
-    // { bod: 4, agi: 3, str: 5, wil: 4, log: 3, int: 4, cha: 2, rea: 3, luk: 2 }
     const attrs: Attributes = {
       bod: 4,  // 45
       agi: 3,  // 25
@@ -95,8 +90,6 @@ describe('calculateAttributeCosts', () => {
   });
 
   it('should calculate total for all attributes at 10 (maximum)', () => {
-    // Each attribute at 10 costs 270
-    // 9 attributes * 270 = 2430
     expect(calculateAttributeCosts(maxAttributes)).toBe(2430);
   });
 
@@ -114,18 +107,14 @@ describe('calculateTraditionCost', () => {
     });
 
     it('should return 0 for tradition = 1', () => {
-      // Formula: (tradition^2 + 7*tradition - 8) * 2.5
-      // (1 + 7 - 8) * 2.5 = 0 * 2.5 = 0
       expect(calculateTraditionCost(1)).toBe(0);
     });
 
     it('should calculate cost for tradition = 5', () => {
-      // (25 + 35 - 8) * 2.5 = 52 * 2.5 = 130
       expect(calculateTraditionCost(5)).toBe(130);
     });
 
     it('should calculate cost for tradition = 10 (maximum)', () => {
-      // (100 + 70 - 8) * 2.5 = 162 * 2.5 = 405
       expect(calculateTraditionCost(10)).toBe(405);
     });
   });
@@ -133,7 +122,6 @@ describe('calculateTraditionCost', () => {
   describe('progressive cost increase', () => {
     it('should have increasing costs', () => {
       const costs = [2, 3, 4, 5, 6].map(calculateTraditionCost);
-      // Verify each cost is higher than the previous
       for (let i = 1; i < costs.length; i++) {
         expect(costs[i]).toBeGreaterThan(costs[i - 1]);
       }
@@ -160,18 +148,14 @@ describe('calculateSkillCost', () => {
     });
 
     it('should calculate cost for rank = 1, multiplier = 1.0 (individual skill)', () => {
-      // Formula: (rank^2 + rank + 2) * costMultiplier
-      // (1 + 1 + 2) * 1.0 = 4
       expect(calculateSkillCost(1, 1.0)).toBe(4);
     });
 
     it('should calculate cost for rank = 5, multiplier = 2.5 (skill group)', () => {
-      // (25 + 5 + 2) * 2.5 = 32 * 2.5 = 80
       expect(calculateSkillCost(5, 2.5)).toBe(80);
     });
 
     it('should calculate cost for rank = 10, multiplier = 0.5 (knowledge skill)', () => {
-      // (100 + 10 + 2) * 0.5 = 112 * 0.5 = 56
       expect(calculateSkillCost(10, 0.5)).toBe(56);
     });
   });
@@ -180,20 +164,15 @@ describe('calculateSkillCost', () => {
     it('should scale cost with multiplier', () => {
       const rank = 5;
       const base = calculateSkillCost(rank, 1.0);
-
       expect(calculateSkillCost(rank, 2.5)).toBe(base * 2.5);
       expect(calculateSkillCost(rank, 0.5)).toBe(base * 0.5);
     });
 
     it('should calculate parent skill cost (multiplier 2.5)', () => {
-      // rank = 3, multiplier = 2.5
-      // (9 + 3 + 2) * 2.5 = 14 * 2.5 = 35
       expect(calculateSkillCost(3, 2.5)).toBe(35);
     });
 
     it('should calculate knowledge skill cost (multiplier 0.5)', () => {
-      // rank = 4, multiplier = 0.5
-      // (16 + 4 + 2) * 0.5 = 22 * 0.5 = 11
       expect(calculateSkillCost(4, 0.5)).toBe(11);
     });
   });
@@ -210,7 +189,6 @@ describe('calculateSkillCost', () => {
   describe('edge cases', () => {
     it('should handle high rank values', () => {
       const result = calculateSkillCost(20, 1.0);
-      // (400 + 20 + 2) * 1.0 = 422
       expect(result).toBe(422);
     });
 
@@ -226,17 +204,14 @@ describe('calculateSkillCost', () => {
 
 describe('calculateKnowledgeDiscount', () => {
   it('should calculate discount with LOG=3, INT=4', () => {
-    // (LOG + INT) * 10 = 7 * 10 = 70
     expect(calculateKnowledgeDiscount(3, 4)).toBe(70);
   });
 
   it('should calculate discount with LOG=10, INT=10 (maximum)', () => {
-    // 20 * 10 = 200
     expect(calculateKnowledgeDiscount(10, 10)).toBe(200);
   });
 
   it('should calculate discount with LOG=1, INT=1 (minimum)', () => {
-    // 2 * 10 = 20
     expect(calculateKnowledgeDiscount(1, 1)).toBe(20);
   });
 
@@ -252,14 +227,129 @@ describe('calculateKnowledgeDiscount', () => {
   });
 });
 
+describe('calculateKnowledgeSkillCosts', () => {
+  it('should return 0 with no knowledge skills', () => {
+    expect(calculateKnowledgeSkillCosts([], 5, 5)).toBe(0);
+  });
+
+  it('should calculate cost for dynamic knowledge skills', () => {
+    const ks = [
+      { name: 'Arcana', rank: 5 },  // (25+5+2)*0.5 = 16
+      { name: 'History', rank: 3 }, // (9+3+2)*0.5 = 7
+    ];
+    // Total: 23, discount: (5+5)*10 = 100
+    // After discount: max(0, 23 - 100) = 0
+    expect(calculateKnowledgeSkillCosts(ks, 5, 5)).toBe(0);
+  });
+
+  it('should not go below 0 after discount', () => {
+    const ks = [{ name: 'Test', rank: 1 }]; // (1+1+2)*0.5 = 2
+    // Discount: (5+5)*10 = 100
+    expect(calculateKnowledgeSkillCosts(ks, 5, 5)).toBe(0);
+  });
+
+  it('should charge when cost exceeds discount', () => {
+    const ks = [
+      { name: 'A', rank: 10 }, // (100+10+2)*0.5 = 56
+      { name: 'B', rank: 10 }, // 56
+    ];
+    // Total: 112, discount: (1+1)*10 = 20
+    // After discount: 112 - 20 = 92
+    expect(calculateKnowledgeSkillCosts(ks, 1, 1)).toBe(92);
+  });
+
+  it('should skip rank 0 entries', () => {
+    const ks = [
+      { name: 'Empty', rank: 0 },
+      { name: 'Has Rank', rank: 3 }, // (9+3+2)*0.5 = 7
+    ];
+    // Total: 7, discount: (1+1)*10 = 20
+    expect(calculateKnowledgeSkillCosts(ks, 1, 1)).toBe(0);
+  });
+});
+
+describe('calculateGroupAwareSkillCosts', () => {
+  const mockDefs: SkillDefinition[] = [
+    { name: 'ATHLETICS', type: 'parent', attribute: 'str', costMultiplier: 2.5, category: 'Athletics' },
+    { name: 'Strongman', type: 'individual', attribute: 'str', costMultiplier: 1, category: 'Athletics', parentGroup: 'ATHLETICS' },
+    { name: 'Gymnastics', type: 'individual', attribute: 'agi', costMultiplier: 1, category: 'Athletics', parentGroup: 'ATHLETICS' },
+    { name: 'Weapon', type: 'individual', attribute: 'agi', costMultiplier: 1 },
+    { name: 'Dodge', type: 'individual', attribute: 'rea', costMultiplier: 1 },
+  ];
+
+  it('should charge individual costs when no group purchased', () => {
+    const skills = { 'Strongman': 3, 'Gymnastics': 2 };
+    // Strongman: (9+3+2)*1 = 14, Gymnastics: (4+2+2)*1 = 8
+    expect(calculateGroupAwareSkillCosts(skills, mockDefs)).toBe(22);
+  });
+
+  it('should charge group cost when parent has rank', () => {
+    const skills = { 'ATHLETICS': 3 };
+    // Group: (9+3+2)*2.5 = 35
+    expect(calculateGroupAwareSkillCosts(skills, mockDefs)).toBe(35);
+  });
+
+  it('should not double-charge children when group is purchased', () => {
+    // Even if children somehow have ranks (shouldn't happen via UI), group cost covers them
+    const skills = { 'ATHLETICS': 3, 'Strongman': 2 };
+    // Only group cost: 35 (children covered)
+    expect(calculateGroupAwareSkillCosts(skills, mockDefs)).toBe(35);
+  });
+
+  it('should charge ungrouped skills normally', () => {
+    const skills = { 'Weapon': 5, 'Dodge': 3 };
+    // Weapon: (25+5+2)*1 = 32, Dodge: (9+3+2)*1 = 14
+    expect(calculateGroupAwareSkillCosts(skills, mockDefs)).toBe(46);
+  });
+
+  it('should handle mix of group and ungrouped', () => {
+    const skills = { 'ATHLETICS': 2, 'Weapon': 4 };
+    // Athletics group: (4+2+2)*2.5 = 20, Weapon: (16+4+2)*1 = 22
+    expect(calculateGroupAwareSkillCosts(skills, mockDefs)).toBe(42);
+  });
+
+  it('should return 0 for empty skills', () => {
+    expect(calculateGroupAwareSkillCosts({}, mockDefs)).toBe(0);
+  });
+});
+
+describe('getEffectiveSkillRank', () => {
+  const mockDefs: SkillDefinition[] = [
+    { name: 'ATHLETICS', type: 'parent', attribute: 'str', costMultiplier: 2.5, category: 'Athletics' },
+    { name: 'Strongman', type: 'individual', attribute: 'str', costMultiplier: 1, category: 'Athletics', parentGroup: 'ATHLETICS' },
+    { name: 'Weapon', type: 'individual', attribute: 'agi', costMultiplier: 1 },
+  ];
+
+  it('should return parent rank for grouped child when parent has rank', () => {
+    const skills = { 'ATHLETICS': 5 };
+    expect(getEffectiveSkillRank('Strongman', skills, mockDefs)).toBe(5);
+  });
+
+  it('should return individual rank when parent has no rank', () => {
+    const skills = { 'Strongman': 3 };
+    expect(getEffectiveSkillRank('Strongman', skills, mockDefs)).toBe(3);
+  });
+
+  it('should return 0 when neither parent nor individual has rank', () => {
+    expect(getEffectiveSkillRank('Strongman', {}, mockDefs)).toBe(0);
+  });
+
+  it('should return ungrouped skill rank normally', () => {
+    const skills = { 'Weapon': 4 };
+    expect(getEffectiveSkillRank('Weapon', skills, mockDefs)).toBe(4);
+  });
+
+  it('should return 0 for unknown skill', () => {
+    expect(getEffectiveSkillRank('Unknown', {}, mockDefs)).toBe(0);
+  });
+});
+
 describe('calculateAbilityCosts', () => {
   describe('single-rank abilities', () => {
     it('should calculate cost for single-rank ability', () => {
       const charAbilities = [{ name: 'Test Single Rank', rank: 1 }];
-      const database = [singleRankAbility]; // bpCost: 15
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(15);
+      const database = [singleRankAbility];
+      expect(calculateAbilityCosts(charAbilities, database)).toBe(15);
     });
 
     it('should handle multiple single-rank abilities', () => {
@@ -267,58 +357,40 @@ describe('calculateAbilityCosts', () => {
         { name: 'Test Single Rank', rank: 1 },
         { name: 'Test OR Requirement', rank: 1 },
       ];
-      const database = mockAbilities;
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(35); // 15 + 20
+      expect(calculateAbilityCosts(charAbilities, mockAbilities)).toBe(35);
     });
   });
 
   describe('multi-rank abilities', () => {
     it('should calculate cost for multi-rank ability at rank 1', () => {
       const charAbilities = [{ name: 'Test Multi Rank', rank: 1 }];
-      const database = [multiRankAbility]; // bpCost: [0, 10, 20, 30]
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(10);
+      expect(calculateAbilityCosts(charAbilities, [multiRankAbility])).toBe(10);
     });
 
     it('should calculate cost for multi-rank ability at rank 2', () => {
       const charAbilities = [{ name: 'Test Multi Rank', rank: 2 }];
-      const database = [multiRankAbility];
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(20);
+      expect(calculateAbilityCosts(charAbilities, [multiRankAbility])).toBe(20);
     });
 
     it('should calculate cost for multi-rank ability at rank 3', () => {
       const charAbilities = [{ name: 'Test Multi Rank', rank: 3 }];
-      const database = [multiRankAbility];
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(30);
+      expect(calculateAbilityCosts(charAbilities, [multiRankAbility])).toBe(30);
     });
 
     it('should handle rank 0', () => {
       const charAbilities = [{ name: 'Test Multi Rank', rank: 0 }];
-      const database = [multiRankAbility];
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(0);
+      expect(calculateAbilityCosts(charAbilities, [multiRankAbility])).toBe(0);
     });
   });
 
   describe('multiple abilities', () => {
     it('should calculate total cost for multiple abilities', () => {
       const charAbilities = [
-        { name: 'Test Single Rank', rank: 1 },  // 15
-        { name: 'Test Multi Rank', rank: 2 },   // 20
-        { name: 'Test OR Requirement', rank: 1 }, // 20
+        { name: 'Test Single Rank', rank: 1 },
+        { name: 'Test Multi Rank', rank: 2 },
+        { name: 'Test OR Requirement', rank: 1 },
       ];
-      const database = mockAbilities;
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(55); // 15 + 20 + 20
+      expect(calculateAbilityCosts(charAbilities, mockAbilities)).toBe(55);
     });
   });
 
@@ -328,38 +400,29 @@ describe('calculateAbilityCosts', () => {
         { name: 'Unknown Ability', rank: 1 },
         { name: 'Test Single Rank', rank: 1 },
       ];
-      const database = mockAbilities;
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(15); // Only counts the known ability
+      expect(calculateAbilityCosts(charAbilities, mockAbilities)).toBe(15);
     });
 
     it('should handle empty character abilities', () => {
-      const result = calculateAbilityCosts([], mockAbilities);
-      expect(result).toBe(0);
+      expect(calculateAbilityCosts([], mockAbilities)).toBe(0);
     });
 
     it('should handle empty database', () => {
       const charAbilities = [{ name: 'Test', rank: 1 }];
-      const result = calculateAbilityCosts(charAbilities, []);
-      expect(result).toBe(0);
+      expect(calculateAbilityCosts(charAbilities, [])).toBe(0);
     });
   });
 
   describe('edge cases', () => {
     it('should cap rank at array length for multi-rank abilities', () => {
       const charAbilities = [{ name: 'Test Multi Rank', rank: 10 }];
-      const database = [multiRankAbility]; // Only has 4 ranks (0-3)
-
-      const result = calculateAbilityCosts(charAbilities, database);
-      expect(result).toBe(30); // Capped at rank 3
+      expect(calculateAbilityCosts(charAbilities, [multiRankAbility])).toBe(30);
     });
   });
 });
 
 describe('calculateAffinityPoints', () => {
   it('should return 0 for tradition = 0', () => {
-    // Formula: tradition * 3
     expect(calculateAffinityPoints(0)).toBe(0);
   });
 
@@ -385,27 +448,14 @@ describe('calculateAffinityPoints', () => {
 
 describe('calculateTotalBPSpent', () => {
   const mockSkillDefinitions: SkillDefinition[] = [
-    { name: 'Blades', category: 'Combat', costMultiplier: 1.0, type: 'individual', attribute: 'str' },
-    { name: 'Athletics', category: 'Physical', costMultiplier: 1.0, type: 'individual', attribute: 'agi' },
-    { name: 'Knowledge', category: 'Knowledge', costMultiplier: 0.5, type: 'knowledge', attribute: 'log' },
+    { name: 'Weapon', costMultiplier: 1.0, type: 'individual', attribute: 'agi' },
+    { name: 'Strongman', costMultiplier: 1.0, type: 'individual', attribute: 'str', parentGroup: 'ATHLETICS' },
+    { name: 'ATHLETICS', costMultiplier: 2.5, type: 'parent', attribute: 'str', category: 'Athletics' },
   ];
 
   describe('integration tests', () => {
     it('should calculate total for starting character (all 1s, no skills/abilities)', () => {
-      const attrs = minAttributes; // All 1s
-      const tradition = 0;
-      const skills = {};
-      const abilities: { name: string; rank: number }[] = [];
-      const database: Ability[] = [];
-
-      const result = calculateTotalBPSpent(attrs, tradition, skills, mockSkillDefinitions, abilities, database);
-
-      // Attribute costs: 0
-      // Tradition cost: 0
-      // Skill costs: 0
-      // Ability costs: 0
-      // Knowledge discount only applies to knowledge skills (none purchased here)
-      // Total: 0
+      const result = calculateTotalBPSpent(minAttributes, 0, {}, mockSkillDefinitions, [], []);
       expect(result).toBe(0);
     });
 
@@ -422,82 +472,61 @@ describe('calculateTotalBPSpent', () => {
         luk: 2,  // 10
       };
       // Attribute total: 335
-
       const tradition = 5; // 130
       const skills = {
-        'Blades': 3,     // (9 + 3 + 2) * 1.0 = 14
-        'Athletics': 2,  // (4 + 2 + 2) * 1.0 = 8
+        'Weapon': 3,     // (9 + 3 + 2) * 1.0 = 14
+        'Strongman': 2,  // (4 + 2 + 2) * 1.0 = 8
       };
       // Skill total: 22
 
       const abilities = [{ name: 'Test Single Rank', rank: 1 }]; // 15
       const database = [singleRankAbility];
 
-      // Knowledge discount: (4 + 4) * 10 = 80
-
       const result = calculateTotalBPSpent(attrs, tradition, skills, mockSkillDefinitions, abilities, database);
-
-      // Knowledge discount only applies to knowledge skills (no knowledge skills in this test)
       // Total: 335 + 130 + 22 + 15 = 502
       expect(result).toBe(502);
     });
 
     it('should calculate total for high-BP character', () => {
-      const attrs = maxAttributes; // 2430
-      const tradition = 10; // 405
       const skills = {
-        'Blades': 10,    // (100 + 10 + 2) * 1.0 = 112
-        'Athletics': 10, // 112
+        'Weapon': 10,    // (100 + 10 + 2) * 1.0 = 112
+        'Strongman': 10, // 112
       };
-      // Skill total: 224
 
       const abilities = [
         { name: 'Test Single Rank', rank: 1 },  // 15
         { name: 'Test Multi Rank', rank: 3 },   // 30
       ];
-      const database = mockAbilities;
-      // Ability total: 45
 
-      // Knowledge discount: (10 + 10) * 10 = 200
-
-      const result = calculateTotalBPSpent(attrs, tradition, skills, mockSkillDefinitions, abilities, database);
-
-      // Knowledge discount only applies to knowledge skill costs now
-      // Knowledge skills cost 40 BP before discount
-      // After discount (100): max(0, 40 - 100) = 0
-      // Total: 2430 + 405 + 184 + 45 + 40 = 3104
+      const result = calculateTotalBPSpent(maxAttributes, 10, skills, mockSkillDefinitions, abilities, mockAbilities);
+      // 2430 + 405 + 224 + 45 = 3104
       expect(result).toBe(3104);
     });
 
-    it('should calculate correctly with knowledge skills', () => {
-      const attrs = standardAttributes;
-      const tradition = 5;
-      const skills = {
-        'Blades': 3,      // (9 + 3 + 2) * 1.0 = 14
-        'Knowledge': 5,   // (25 + 5 + 2) * 0.5 = 16
-      };
-      const abilities: { name: string; rank: number }[] = [];
-      const database: Ability[] = [];
-
-      const result = calculateTotalBPSpent(attrs, tradition, skills, mockSkillDefinitions, abilities, database);
-
-      // Verify knowledge skill uses 0.5 multiplier
-      expect(result).toBeGreaterThan(0);
+    it('should include knowledge skill costs', () => {
+      const knowledgeSkills = [
+        { name: 'Arcana', rank: 5 }, // (25+5+2)*0.5 = 16
+      ];
+      // Discount: (1+1)*10 = 20 -> max(0, 16-20) = 0
+      const result = calculateTotalBPSpent(minAttributes, 0, {}, mockSkillDefinitions, [], [], knowledgeSkills);
+      expect(result).toBe(0);
     });
 
-    it('should handle overspent character correctly', () => {
-      // Character with high BP spent (over 500 budget)
-      const attrs = maxAttributes; // 2430
-      const tradition = 10; // 405
-      const skills = { 'Blades': 10 }; // 112
-      const abilities = [{ name: 'Test Multi Rank', rank: 3 }]; // 30
-      const database = mockAbilities;
+    it('should charge knowledge when cost exceeds discount', () => {
+      const knowledgeSkills = [
+        { name: 'A', rank: 10 }, // 56
+        { name: 'B', rank: 10 }, // 56
+      ];
+      // Total: 112, discount: (1+1)*10 = 20 -> 92
+      const result = calculateTotalBPSpent(minAttributes, 0, {}, mockSkillDefinitions, [], [], knowledgeSkills);
+      expect(result).toBe(92);
+    });
 
-      const result = calculateTotalBPSpent(attrs, tradition, skills, mockSkillDefinitions, abilities, database);
-
-      // Should return correct calculation regardless of budget
-      expect(result).toBeGreaterThan(500);
-      expect(typeof result).toBe('number');
+    it('should handle group skill costs in total', () => {
+      const skills = { 'ATHLETICS': 3 };
+      // Group cost: (9+3+2)*2.5 = 35
+      const result = calculateTotalBPSpent(minAttributes, 0, skills, mockSkillDefinitions, [], []);
+      expect(result).toBe(35);
     });
   });
 
@@ -505,7 +534,7 @@ describe('calculateTotalBPSpent', () => {
     it('should include all cost components', () => {
       const attrs: Attributes = { ...standardAttributes, log: 5, int: 5 };
       const tradition = 3;
-      const skills = { 'Blades': 2 };
+      const skills = { 'Weapon': 2 };
       const abilities = [{ name: 'Test Single Rank', rank: 1 }];
       const database = [singleRankAbility];
 
@@ -516,7 +545,6 @@ describe('calculateTotalBPSpent', () => {
       const skillCost = calculateSkillCost(2, 1.0);
       const abilityCost = 15;
 
-      // Discount only applies to knowledge skills now (Blades is not a knowledge skill)
       const expected = attrCost + tradCost + skillCost + abilityCost;
       expect(total).toBe(expected);
     });
@@ -524,30 +552,8 @@ describe('calculateTotalBPSpent', () => {
 
   describe('edge cases', () => {
     it('should handle all zeros', () => {
-      const result = calculateTotalBPSpent(
-        minAttributes,
-        0,
-        {},
-        mockSkillDefinitions,
-        [],
-        []
-      );
-
-      // No skills, no tradition, attributes all at 1 = 0 BP
-      // Knowledge discount only applies to knowledge skills now
+      const result = calculateTotalBPSpent(minAttributes, 0, {}, mockSkillDefinitions, [], []);
       expect(result).toBe(0);
-    });
-
-    it('should handle discount only applying to knowledge skills', () => {
-      const attrs: Attributes = minAttributes; // All attributes at 1
-      const result = calculateTotalBPSpent(attrs, 0, {}, mockSkillDefinitions, [], []);
-
-      // Knowledge discount: only applies to knowledge skill costs (not a flat discount)
-      // Attribute costs: all at 1 = 0
-      // No skills purchased = 0
-      // Total: 0
-      expect(result).toBe(0);
-      expect(result).toBeGreaterThanOrEqual(0);
     });
   });
 });
