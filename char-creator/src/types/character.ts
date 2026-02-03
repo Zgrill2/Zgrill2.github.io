@@ -43,6 +43,9 @@ export interface Character {
   // Skills: skill name -> rank
   skills: Record<string, number>;
 
+  // Knowledge Skills: dynamic free-form entries
+  knowledgeSkills: Array<{ name: string; rank: number }>;
+
   // Abilities
   abilities: CharacterAbility[];
 

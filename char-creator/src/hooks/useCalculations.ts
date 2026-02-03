@@ -3,8 +3,8 @@ import { useCharacterContext } from '../context/CharacterContext';
 import {
   calculateAttributeCosts,
   calculateTraditionCost,
-  calculateSkillCosts,
   calculateKnowledgeDiscount,
+  calculateKnowledgeSkillCosts,
   calculateAbilityCosts,
   calculateAffinityPoints,
   calculateHealthPools,
@@ -14,6 +14,8 @@ import {
   calculateSkillDicepool,
   calculateWeaponDicepool,
   calculateTotalBPSpent,
+  calculateGroupAwareSkillCosts,
+  getEffectiveSkillRank,
 } from '../utils/calculations';
 
 import skillsData from '../data/skills.json';
@@ -42,13 +44,22 @@ export function useCalculations() {
   );
 
   const skillCosts = useMemo(
-    () => calculateSkillCosts(character.skills, skills),
+    () => calculateGroupAwareSkillCosts(character.skills, skills),
     [character.skills]
   );
 
   const knowledgeDiscount = useMemo(
     () => calculateKnowledgeDiscount(character.attributes.log, character.attributes.int),
     [character.attributes.log, character.attributes.int]
+  );
+
+  const knowledgeSkillCosts = useMemo(
+    () => calculateKnowledgeSkillCosts(
+      character.knowledgeSkills,
+      character.attributes.log,
+      character.attributes.int
+    ),
+    [character.knowledgeSkills, character.attributes.log, character.attributes.int]
   );
 
   const abilityCosts = useMemo(
@@ -63,9 +74,10 @@ export function useCalculations() {
       character.skills,
       skills,
       character.abilities,
-      abilities
+      abilities,
+      character.knowledgeSkills
     ),
-    [character.attributes, character.tradition, character.skills, character.abilities]
+    [character.attributes, character.tradition, character.skills, character.abilities, character.knowledgeSkills]
   );
 
   const bpRemaining = character.bpBudget - bpSpent;
@@ -113,12 +125,12 @@ export function useCalculations() {
     [character.attributes]
   );
 
-  // Helper function to get skill dicepool
+  // Helper function to get skill dicepool (group-aware)
   const getSkillDicepool = (skillName: string) => {
     const skillDef = skills.find(s => s.name === skillName);
     if (!skillDef) return 0;
 
-    const rank = character.skills[skillName] || 0;
+    const rank = getEffectiveSkillRank(skillName, character.skills, skills);
     const attributeValue = character.attributes[skillDef.attribute];
 
     return calculateSkillDicepool(character.tradition, rank, attributeValue);
@@ -139,6 +151,7 @@ export function useCalculations() {
     traditionCost,
     skillCosts,
     knowledgeDiscount,
+    knowledgeSkillCosts,
     abilityCosts,
     bpSpent,
     bpRemaining,

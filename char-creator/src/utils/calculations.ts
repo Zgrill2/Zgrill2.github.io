@@ -44,7 +44,7 @@ export function calculateSkillCost(rank: number, costMultiplier: number): number
 }
 
 /**
- * Calculate total BP cost for all skills
+ * Calculate total BP cost for all skills (legacy, kept for backward compat)
  */
 export function calculateSkillCosts(
   skills: Record<string, number>,
@@ -139,33 +139,27 @@ export function calculateHealthPools(
 }
 
 /**
- * Calculate defense stats
+ * Calculate defense stats (Parry and Block removed)
  */
 export interface DefenseStats {
   dodgePassive: number;
   dodgeActive: number;
-  parry: number;
-  block: number;
 }
 
 export function calculateDefenseStats(
   attributes: Attributes,
   tradition: number,
   skills: Record<string, number>,
-  modifiers: { dodge?: number; parry?: number; block?: number; lightArmorBonus?: number } = {}
+  modifiers: { dodge?: number; lightArmorBonus?: number } = {}
 ): DefenseStats {
   const intReaBase = attributes.int + attributes.rea;
   const halfTradition = Math.ceil(tradition / 2);
 
   const dodgeSkillRank = skills['Dodge'] || 0;
-  const parrySkillRank = skills['Parry'] || 0; // Assuming there's a Parry skill
-  const blockSkillRank = skills['Block'] || 0; // Assuming there's a Block skill
 
   return {
     dodgePassive: intReaBase,
     dodgeActive: intReaBase + dodgeSkillRank + Math.min(dodgeSkillRank, halfTradition) + (modifiers.dodge || 0) + (modifiers.lightArmorBonus || 0),
-    parry: intReaBase + parrySkillRank + Math.min(parrySkillRank, halfTradition) + (modifiers.parry || 0),
-    block: intReaBase + blockSkillRank + Math.min(blockSkillRank, halfTradition) + (modifiers.block || 0),
   };
 }
 
@@ -210,8 +204,7 @@ export function calculateSoakStats(
 
 /**
  * Calculate weapon dicepool
- * Formula: attribute + weapon_skill_rank + reach_modifier
- * Note: The attribute depends on the weapon type (typically STR for melee, AGI for ranged)
+ * Default skill is 'Weapon'
  */
 export function calculateWeaponDicepool(
   weapon: Weapon,
@@ -219,8 +212,6 @@ export function calculateWeaponDicepool(
   skills: Record<string, number>,
   tradition: number
 ): number {
-  // Determine which attribute to use based on weapon type
-  // This is a simplified version - you may need to adjust based on game rules
   let attributeValue = 0;
   if (weapon.type === 'light') {
     attributeValue = attributes.agi;
@@ -228,13 +219,14 @@ export function calculateWeaponDicepool(
     attributeValue = attributes.str;
   }
 
-  // Get skill rank
-  const skillRank = weapon.skillName ? (skills[weapon.skillName] || 0) : 0;
+  // Get skill rank, defaulting to 'Weapon' skill
+  const skillName = weapon.skillName || 'Weapon';
+  const skillRank = skills[skillName] || 0;
 
   // Base dicepool
   let dicepool = attributeValue + skillRank + weapon.reach;
 
-  // Add tradition bonus (might not apply to all weapons)
+  // Add tradition bonus
   dicepool += Math.min(skillRank, Math.ceil(tradition / 2));
 
   return dicepool;
@@ -255,26 +247,89 @@ export function getShieldBonus(shieldType: string): number {
 }
 
 /**
+ * Get the effective skill rank considering group purchases.
+ * If the parent group has a rank, all children use that rank.
+ * Otherwise, use the individual skill's rank.
+ */
+export function getEffectiveSkillRank(
+  skillName: string,
+  skills: Record<string, number>,
+  skillDefinitions: SkillDefinition[]
+): number {
+  const skillDef = skillDefinitions.find(s => s.name === skillName);
+  if (!skillDef) return skills[skillName] || 0;
+
+  // If this is a child skill with a parent group, check the parent's rank
+  if (skillDef.parentGroup) {
+    const parentRank = skills[skillDef.parentGroup] || 0;
+    if (parentRank > 0) {
+      return parentRank;
+    }
+  }
+
+  return skills[skillName] || 0;
+}
+
+/**
+ * Calculate group-aware skill costs.
+ * - When a parent group has a rank, charge group cost (2.5x) for the parent only;
+ *   individual children are covered by the group purchase.
+ * - When parent has no rank, charge individual children at 1x each.
+ * - Ungrouped skills are always charged individually.
+ */
+export function calculateGroupAwareSkillCosts(
+  skills: Record<string, number>,
+  skillDefinitions: SkillDefinition[]
+): number {
+  let total = 0;
+  const processedGroups = new Set<string>();
+
+  for (const skillDef of skillDefinitions) {
+    if (skillDef.type === 'parent') {
+      const parentRank = skills[skillDef.name] || 0;
+      if (parentRank > 0) {
+        // Charge group cost for parent
+        total += calculateSkillCost(parentRank, skillDef.costMultiplier);
+        processedGroups.add(skillDef.name);
+      }
+    }
+  }
+
+  for (const skillDef of skillDefinitions) {
+    if (skillDef.type === 'individual') {
+      if (skillDef.parentGroup && processedGroups.has(skillDef.parentGroup)) {
+        // This child is covered by group purchase, skip
+        continue;
+      }
+      const rank = skills[skillDef.name] || 0;
+      if (rank > 0) {
+        total += calculateSkillCost(rank, skillDef.costMultiplier);
+      }
+    }
+  }
+
+  return total;
+}
+
+/**
  * Calculate knowledge skill costs (with discount applied)
+ * Now accepts dynamic knowledge skills array instead of scanning skill definitions
  */
 export function calculateKnowledgeSkillCosts(
-  skills: Record<string, number>,
-  skillDefinitions: SkillDefinition[],
+  knowledgeSkills: Array<{ name: string; rank: number }>,
   log: number,
   int: number
 ): number {
   let knowledgeTotal = 0;
 
-  for (const [skillName, rank] of Object.entries(skills)) {
-    const skillDef = skillDefinitions.find(s => s.name === skillName);
-    if (skillDef && rank > 0 && skillDef.costMultiplier === 0.5) {
-      // This is a knowledge skill (cost multiplier 0.5)
-      knowledgeTotal += calculateSkillCost(rank, skillDef.costMultiplier);
+  for (const ks of knowledgeSkills) {
+    if (ks.rank > 0) {
+      knowledgeTotal += calculateSkillCost(ks.rank, 0.5);
     }
   }
 
   const discount = calculateKnowledgeDiscount(log, int);
-  return Math.max(0, knowledgeTotal - discount); // Can't go below 0
+  return Math.max(0, knowledgeTotal - discount);
 }
 
 /**
@@ -286,24 +341,19 @@ export function calculateTotalBPSpent(
   skills: Record<string, number>,
   skillDefinitions: SkillDefinition[],
   abilities: { name: string; rank: number }[],
-  abilityDatabase: Ability[]
+  abilityDatabase: Ability[],
+  knowledgeSkills: Array<{ name: string; rank: number }> = []
 ): number {
   const attributeCost = calculateAttributeCosts(attributes);
   const traditionCost = calculateTraditionCost(tradition);
 
-  // Calculate non-knowledge skill costs
-  let nonKnowledgeSkillCosts = 0;
-  for (const [skillName, rank] of Object.entries(skills)) {
-    const skillDef = skillDefinitions.find(s => s.name === skillName);
-    if (skillDef && rank > 0 && skillDef.costMultiplier !== 0.5) {
-      nonKnowledgeSkillCosts += calculateSkillCost(rank, skillDef.costMultiplier);
-    }
-  }
+  // Calculate group-aware skill costs (handles parent groups and ungrouped)
+  const skillCosts = calculateGroupAwareSkillCosts(skills, skillDefinitions);
 
   // Calculate knowledge skill costs with discount
-  const knowledgeSkillCosts = calculateKnowledgeSkillCosts(skills, skillDefinitions, attributes.log, attributes.int);
+  const knowledgeSkillCosts = calculateKnowledgeSkillCosts(knowledgeSkills, attributes.log, attributes.int);
 
   const abilityCosts = calculateAbilityCosts(abilities, abilityDatabase);
 
-  return attributeCost + traditionCost + nonKnowledgeSkillCosts + knowledgeSkillCosts + abilityCosts;
+  return attributeCost + traditionCost + skillCosts + knowledgeSkillCosts + abilityCosts;
 }

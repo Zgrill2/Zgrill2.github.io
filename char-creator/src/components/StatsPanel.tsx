@@ -69,8 +69,6 @@ export default function StatsPanel() {
           <div className="space-y-2">
             <StatDisplay label="Dodge (Passive)" value={defenseStats.dodgePassive} color="#00FFB8" />
             <StatDisplay label="Dodge (Active)" value={defenseStats.dodgeActive} color="#00FFB8" />
-            <StatDisplay label="Parry" value={defenseStats.parry} color="#00FFB8" />
-            <StatDisplay label="Block" value={defenseStats.block} color="#00FFB8" />
           </div>
         </div>
 

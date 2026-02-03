@@ -27,6 +27,7 @@ const createInitialCharacter = (): Character => ({
     g: 0,
   },
   skills: {},
+  knowledgeSkills: [],
   abilities: [],
   weapons: [],
   armorType: 'none',
@@ -43,6 +44,10 @@ type CharacterAction =
   | { type: 'SET_CAST_STAT'; payload: AttributeName }
   | { type: 'SET_AFFINITY'; payload: { color: 'w' | 'u' | 'b' | 'r' | 'g'; value: number } }
   | { type: 'SET_SKILL'; payload: { skillName: string; rank: number } }
+  | { type: 'SET_GROUP_SKILL'; payload: { groupName: string; rank: number; childNames: string[] } }
+  | { type: 'ADD_KNOWLEDGE_SKILL' }
+  | { type: 'UPDATE_KNOWLEDGE_SKILL'; payload: { index: number; name?: string; rank?: number } }
+  | { type: 'REMOVE_KNOWLEDGE_SKILL'; payload: number }
   | { type: 'ADD_ABILITY'; payload: CharacterAbility }
   | { type: 'UPDATE_ABILITY'; payload: { name: string; rank: number } }
   | { type: 'REMOVE_ABILITY'; payload: string } // ability name
@@ -86,7 +91,7 @@ function characterReducer(state: Character, action: CharacterAction): Character 
         },
       };
 
-    case 'SET_SKILL':
+    case 'SET_SKILL': {
       const newSkills = { ...state.skills };
       if (action.payload.rank === 0) {
         delete newSkills[action.payload.skillName];
@@ -94,6 +99,47 @@ function characterReducer(state: Character, action: CharacterAction): Character 
         newSkills[action.payload.skillName] = action.payload.rank;
       }
       return { ...state, skills: newSkills };
+    }
+
+    case 'SET_GROUP_SKILL': {
+      const newSkills = { ...state.skills };
+      const { groupName, rank, childNames } = action.payload;
+      if (rank === 0) {
+        delete newSkills[groupName];
+      } else {
+        newSkills[groupName] = rank;
+      }
+      // When setting a group rank, clear all child individual ranks
+      for (const childName of childNames) {
+        delete newSkills[childName];
+      }
+      return { ...state, skills: newSkills };
+    }
+
+    case 'ADD_KNOWLEDGE_SKILL':
+      return {
+        ...state,
+        knowledgeSkills: [...state.knowledgeSkills, { name: '', rank: 0 }],
+      };
+
+    case 'UPDATE_KNOWLEDGE_SKILL': {
+      const { index, name, rank } = action.payload;
+      const updatedKS = [...state.knowledgeSkills];
+      if (index >= 0 && index < updatedKS.length) {
+        updatedKS[index] = {
+          ...updatedKS[index],
+          ...(name !== undefined ? { name } : {}),
+          ...(rank !== undefined ? { rank } : {}),
+        };
+      }
+      return { ...state, knowledgeSkills: updatedKS };
+    }
+
+    case 'REMOVE_KNOWLEDGE_SKILL':
+      return {
+        ...state,
+        knowledgeSkills: state.knowledgeSkills.filter((_, i) => i !== action.payload),
+      };
 
     case 'ADD_ABILITY':
       return {

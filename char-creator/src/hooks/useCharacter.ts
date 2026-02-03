@@ -38,6 +38,23 @@ export function useCharacter() {
       dispatch({ type: 'SET_SKILL', payload: { skillName, rank } });
     },
 
+    setGroupSkill: (groupName: string, rank: number, childNames: string[]) => {
+      dispatch({ type: 'SET_GROUP_SKILL', payload: { groupName, rank, childNames } });
+    },
+
+    // Knowledge Skills
+    addKnowledgeSkill: () => {
+      dispatch({ type: 'ADD_KNOWLEDGE_SKILL' });
+    },
+
+    updateKnowledgeSkill: (index: number, name?: string, rank?: number) => {
+      dispatch({ type: 'UPDATE_KNOWLEDGE_SKILL', payload: { index, name, rank } });
+    },
+
+    removeKnowledgeSkill: (index: number) => {
+      dispatch({ type: 'REMOVE_KNOWLEDGE_SKILL', payload: index });
+    },
+
     // Abilities
     addAbility: (ability: CharacterAbility) => {
       dispatch({ type: 'ADD_ABILITY', payload: ability });

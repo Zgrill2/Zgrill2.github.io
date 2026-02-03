@@ -1,4 +1,5 @@
 import { Character } from '../types/character';
+import { migrateSkills } from './storage';
 
 /**
  * Export character to JSON file
@@ -34,7 +35,8 @@ export async function importCharacter(file: File): Promise<Character> {
           throw new Error('Invalid character file format');
         }
 
-        resolve(character);
+        // Migrate old skill names and data
+        resolve(migrateSkills(character));
       } catch (error) {
         reject(new Error('Failed to parse character file: ' + (error as Error).message));
       }
