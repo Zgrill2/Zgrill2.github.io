@@ -17,6 +17,9 @@ const COLOR_SEGMENTS: ColorSegment[] = [
   { id: 'g', name: 'Green', displayName: 'G', color: '#27AE60', angle: 198 }, // Top-left
 ];
 
+// Pentagon vertices — rotated so one point faces down (90 deg)
+const VERTEX_ANGLES = [-54, 18, 90, 162, 234];
+
 export default function ColorPieWheel() {
   const { character, setAffinity } = useCharacter();
   const { affinityPoints } = useCalculations();
@@ -104,8 +107,8 @@ export default function ColorPieWheel() {
 
           {/* Pentagon shape connecting the 5 colors - outline */}
           <polygon
-            points={COLOR_SEGMENTS.map((seg) => {
-              const pos = getSegmentPosition(seg.angle, 140);
+            points={VERTEX_ANGLES.map((angle) => {
+              const pos = getSegmentPosition(angle, 140);
               return `${pos.x},${pos.y}`;
             }).join(' ')}
             fill="none"
@@ -115,70 +118,71 @@ export default function ColorPieWheel() {
           />
 
           {/* Filled pentagon areas for each color segment */}
-          {COLOR_SEGMENTS.map((segment, idx) => {
-            const value = character.affinities[segment.id] || 0;
-            if (value === 0) return null;
+          {(() => {
+            const maxAllocatedValue = Math.max(...Object.values(character.affinities), 1);
+            return COLOR_SEGMENTS.map((segment, idx) => {
+              const value = character.affinities[segment.id] || 0;
+              if (value === 0) return null;
 
-            const intensity = value / 10; // Max 10 points per color
-            const nextIdx = (idx + 1) % COLOR_SEGMENTS.length;
-            const nextSegment = COLOR_SEGMENTS[nextIdx];
+              const intensity = value / maxAllocatedValue;
+              // Fill triangle spans from VERTEX_ANGLES[(i+4)%5] to VERTEX_ANGLES[i]
+              const v1Angle = VERTEX_ANGLES[(idx + 4) % 5];
+              const v2Angle = VERTEX_ANGLES[idx];
 
-            // Calculate positions for the triangle from center
-            const pos1 = getSegmentPosition(segment.angle, 140 * intensity);
-            const pos2 = getSegmentPosition(nextSegment.angle, 140 * intensity);
+              const pos1 = getSegmentPosition(v1Angle, 140 * intensity);
+              const pos2 = getSegmentPosition(v2Angle, 140 * intensity);
 
-            // Create a filled area from center to the two adjacent vertices
-            const pathData = `M 200 200 L ${pos1.x} ${pos1.y} L ${pos2.x} ${pos2.y} Z`;
+              const pathData = `M 200 200 L ${pos1.x} ${pos1.y} L ${pos2.x} ${pos2.y} Z`;
+              const gradientId = `gradient-${segment.id}`;
 
-            // Create gradient ID for this segment
-            const gradientId = `gradient-${segment.id}`;
+              return (
+                <g key={segment.id}>
+                  <defs>
+                    <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
+                      <stop offset="0%" stopColor={segment.color} stopOpacity="0.05" />
+                      <stop offset="100%" stopColor={segment.color} stopOpacity={0.2 + intensity * 0.3} />
+                    </radialGradient>
+                  </defs>
+                  <path
+                    d={pathData}
+                    fill={`url(#${gradientId})`}
+                    className="transition-all duration-300"
+                  />
+                </g>
+              );
+            });
+          })()}
+
+          {/* Divider lines from center to each vertex */}
+          {VERTEX_ANGLES.map((angle, idx) => {
+            const pos = getSegmentPosition(angle, 140);
+            // Use the segment on either side to determine brightness
+            const seg = COLOR_SEGMENTS[idx];
+            const value = seg ? (character.affinities[seg.id] || 0) : 0;
+            const maxAllocatedValue = Math.max(...Object.values(character.affinities), 1);
+            const intensity = value / maxAllocatedValue;
 
             return (
-              <g key={segment.id}>
-                <defs>
-                  <radialGradient id={gradientId} cx="50%" cy="50%" r="50%">
-                    <stop offset="0%" stopColor={segment.color} stopOpacity="0.05" />
-                    <stop offset="100%" stopColor={segment.color} stopOpacity={0.2 + intensity * 0.3} />
-                  </radialGradient>
-                </defs>
-                <path
-                  d={pathData}
-                  fill={`url(#${gradientId})`}
-                  className="transition-all duration-300"
-                />
-              </g>
+              <line
+                key={`divider-${idx}`}
+                x1="200"
+                y1="200"
+                x2={pos.x}
+                y2={pos.y}
+                stroke="#00E5FF"
+                strokeWidth="2"
+                opacity={0.2 + intensity * 0.5}
+              />
             );
           })}
 
-          {/* Lines from center to each point */}
+          {/* Label bubbles at segment centers (midpoints between vertices) */}
           {COLOR_SEGMENTS.map((segment) => {
             const pos = getSegmentPosition(segment.angle, 140);
             const value = character.affinities[segment.id] || 0;
-            const intensity = value / 10; // Max 10 points per color
 
             return (
               <g key={segment.id}>
-                {/* Line from center */}
-                <line
-                  x1="200"
-                  y1="200"
-                  x2={pos.x}
-                  y2={pos.y}
-                  stroke={segment.color}
-                  strokeWidth="2"
-                  opacity={0.2 + intensity * 0.5}
-                />
-
-                {/* Filled segment (pie slice) based on allocation */}
-                {value > 0 && (
-                  <path
-                    d={`M 200 200 L ${pos.x} ${pos.y} A 140 140 0 0 1 ${pos.x} ${pos.y} Z`}
-                    fill={segment.color}
-                    opacity={0.1 + intensity * 0.3}
-                  />
-                )}
-
-                {/* Color circle at point */}
                 <circle
                   cx={pos.x}
                   cy={pos.y}
@@ -192,8 +196,6 @@ export default function ColorPieWheel() {
                     filter: value > 0 ? `drop-shadow(0 0 ${5 + value * 2}px ${segment.color})` : 'none',
                   }}
                 />
-
-                {/* Display symbol (W, U, B, R, G) */}
                 <text
                   x={pos.x}
                   y={pos.y}

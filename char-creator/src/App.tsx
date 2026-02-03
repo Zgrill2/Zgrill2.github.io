@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { CharacterProvider } from './context/CharacterContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { ToastProvider } from './context/ToastContext';
+import Toast from './components/Toast';
 import Header from './components/Header';
 import AttributesPanel from './components/AttributesPanel';
 import MagicPanel from './components/MagicPanel';
@@ -101,11 +103,14 @@ function NotesTab() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <CharacterProvider>
-        <AppContent />
-      </CharacterProvider>
-    </ThemeProvider>
+    <ToastProvider>
+      <ThemeProvider>
+        <CharacterProvider>
+          <AppContent />
+          <Toast />
+        </CharacterProvider>
+      </ThemeProvider>
+    </ToastProvider>
   );
 }
 
